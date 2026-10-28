@@ -9,7 +9,8 @@
  *     find        (необязательно) текст, который выделится в редакторе
  *     cursorAfter (необязательно) курсор встанет на строку после строки с этим текстом
  *     text        задание (HTML). <span class="chip">...</span> копируется по клику
- *     hint        { text, code } подсказка
+ *     hint        { text, code } подсказка, или { text, parts: [{ label, code }] },
+ *                 если код нужно вставить в разные места (у каждой части своя кнопка Скопировать)
  *     check(ctx)  возвращает true, если всё верно, или строку с понятным сообщением
  *     free        true для свободного шага без проверки
  *
@@ -127,7 +128,8 @@ button.addEventListener('click', function () {
         find: 'ТВОЁ ИМЯ',
         text:
           '<p>Слева код твоего сайта на языке HTML, справа сам сайт.</p>' +
-          '<p>Найди строчку с тегом <code>&lt;h1&gt;</code>, это главный заголовок. Замени слова <b>ТВОЁ ИМЯ</b> на своё имя и посмотри, как сайт поменяется.</p>',
+          '<p>Найди строчку с тегом <code>&lt;h1&gt;</code>, это главный заголовок. Замени слова <b>ТВОЁ ИМЯ</b> на своё имя и посмотри, как сайт поменяется.</p>' +
+          '<p class="note">Кнопка Нажми меня пока не работает. Её ты оживишь в конце урока.</p>',
         hint: { text: 'Должно получиться примерно так:', code: '<h1>Привет! Меня зовут Алия</h1>' },
         check: function (ctx) {
           var h1 = ctx.text('h1');
@@ -357,7 +359,8 @@ body.dark {
         text:
           '<p>Сегодня ты сделаешь настоящее веб-приложение: генератор, который выдаёт случайный ответ.</p>' +
           '<p>Сначала выбери тему и впиши её в заголовок <code>&lt;h1&gt;</code> вместо слова ТЕМА. Например:</p>' +
-          '<p class="chips"><span class="chip">никнеймов</span><span class="chip">суперсил</span><span class="chip">идей на выходные</span><span class="chip">отмазок для учителя</span><span class="chip">имён для питомца</span></p>',
+          '<p class="chips"><span class="chip">никнеймов</span><span class="chip">суперсил</span><span class="chip">идей на выходные</span><span class="chip">отмазок для учителя</span><span class="chip">имён для питомца</span></p>' +
+          '<p class="note">Кнопки на сайте пока ничего не делают, так и задумано. Ты оживишь их сам на шагах 4 и 6.</p>',
         hint: { text: 'Например:', code: '<h1>Генератор никнеймов</h1>' },
         check: function (ctx) {
           var h1 = ctx.text('h1');
@@ -425,7 +428,7 @@ body.dark {
           '<p>Найди кнопку <code>#generate</code> и блок <code>#result</code> через <code>document.querySelector</code>. При клике на кнопку записывай в <code>result.textContent</code> случайный вариант.</p>' +
           '<p>Потом понажимай кнопку справа и проверь, что ответы меняются.</p>',
         hint: {
-          text: 'Так это выглядит в коде:',
+          text: 'Вставь под комментарием Шаг 4:',
           code: "const button = document.querySelector('#generate');\nconst result = document.querySelector('#result');\n\nbutton.addEventListener('click', function () {\n  result.textContent = getRandomIdea();\n});"
         },
         check: function (ctx) {
@@ -446,8 +449,11 @@ body.dark {
           '<p>1. Над обработчиком создай переменную <code>let count = 0;</code> Здесь нужен <code>let</code>, а не <code>const</code>, ведь значение будет меняться.</p>' +
           '<p>2. Внутри обработчика клика увеличивай <code>count</code> на 1 и записывай его в <code>#counter</code>.</p>',
         hint: {
-          text: 'Добавь эти строки:',
-          code: "let count = 0;\nconst counter = document.querySelector('#counter');\n\n// а эти внутри addEventListener, под строкой с result:\ncount = count + 1;\ncounter.textContent = count;"
+          text: 'Код состоит из двух частей, вставь каждую в своё место.',
+          parts: [
+            { label: '1. Над строкой button.addEventListener:', code: "let count = 0;\nconst counter = document.querySelector('#counter');" },
+            { label: '2. Внутри обработчика клика, под строкой с result.textContent:', code: 'count = count + 1;\ncounter.textContent = count;' }
+          ]
         },
         check: function (ctx) {
           if (!ctx.$('#counter')) return 'Не нахожу #counter в HTML.';
@@ -470,8 +476,11 @@ body.dark {
           '<p>2. В JavaScript по клику на кнопку <code>#theme</code> переключай класс:</p>' +
           '<p class="chips"><span class="chip">document.body.classList.toggle(\'dark\');</span></p>',
         hint: {
-          text: 'CSS и JavaScript для тёмной темы:',
-          code: "/* CSS */\nbody.dark {\n  background: #12141c;\n  color: #f1f3f9;\n}\n\nbody.dark .app {\n  background: #1e2230;\n}\n\n// JavaScript\nconst themeButton = document.querySelector('#theme');\n\nthemeButton.addEventListener('click', function () {\n  document.body.classList.toggle('dark');\n});"
+          text: 'Здесь два кусочка кода для разных вкладок. Не вставляй CSS во вкладку JS, иначе сломается весь скрипт.',
+          parts: [
+            { label: '1. Во вкладку CSS, вместо пустого блока body.dark:', code: 'body.dark {\n  background: #12141c;\n  color: #f1f3f9;\n}\n\nbody.dark .app {\n  background: #1e2230;\n}' },
+            { label: '2. Во вкладку JS, в самый конец:', code: "const themeButton = document.querySelector('#theme');\n\nthemeButton.addEventListener('click', function () {\n  document.body.classList.toggle('dark');\n});" }
+          ]
         },
         check: function (ctx) {
           if (!ctx.$('#theme')) return 'Не нахожу кнопку #theme в HTML.';

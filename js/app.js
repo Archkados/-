@@ -189,9 +189,6 @@
     $('#clearConsole').addEventListener('click', clearConsole);
     $('#exitBtn').addEventListener('click', exitWorkspace);
     $('#myProjectBtn').addEventListener('click', openFinish);
-    $('#copyHint').addEventListener('click', function () {
-      copyText($('#hintCode').textContent).then(function () { toast('Код подсказки скопирован'); });
-    });
     $('#stepText').addEventListener('click', function (e) {
       var chip = e.target.closest('.chip');
       if (!chip) return;
@@ -246,13 +243,7 @@
 
     var hint = $('#hint');
     hint.open = false;
-    if (s.hint) {
-      hint.hidden = false;
-      $('#hintText').textContent = s.hint.text;
-      $('#hintCode').textContent = s.hint.code;
-    } else {
-      hint.hidden = true;
-    }
+    renderHint(s.hint);
 
     $('#checkBtn').textContent = s.free ? 'Готово' : 'Проверить';
     $('#checkBtn').hidden = false;
@@ -269,10 +260,64 @@
     switchTab(s.tab);
     renderProgress();
     $('.steps-panel').scrollTop = 0;
+    if (isStacked()) window.scrollTo(0, 0);
     if (focus) setTimeout(function () { focusTarget(s); }, 30);
   }
 
+  /* Узкий экран: колонки стоят друг под другом и прокручивается вся страница */
+  function isStacked() {
+    return window.matchMedia('(max-width: 760px)').matches;
+  }
+
+  /*
+   * Подсказка может состоять из нескольких частей для разных вкладок:
+   * hint: { text, code } или hint: { text, parts: [{ label, code }] }
+   */
+  function renderHint(h) {
+    var hint = $('#hint');
+    var body = $('#hintBody');
+    body.innerHTML = '';
+    if (!h) { hint.hidden = true; return; }
+    hint.hidden = false;
+    if (h.text) {
+      var p = document.createElement('p');
+      p.textContent = h.text;
+      body.appendChild(p);
+    }
+    var parts = h.parts || [{ code: h.code }];
+    parts.forEach(function (part) {
+      var wrap = document.createElement('div');
+      wrap.className = 'hint-part';
+      if (part.label) {
+        var lab = document.createElement('p');
+        lab.className = 'hint-label';
+        lab.textContent = part.label;
+        wrap.appendChild(lab);
+      }
+      var pre = document.createElement('pre');
+      pre.textContent = part.code;
+      wrap.appendChild(pre);
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'btn btn-small btn-quiet';
+      btn.textContent = 'Скопировать';
+      btn.addEventListener('click', function () {
+        copyText(part.code).then(function () { toast('Код скопирован. Вставь его через Ctrl+V'); });
+      });
+      wrap.appendChild(btn);
+      body.appendChild(wrap);
+    });
+  }
+
   function focusTarget(s) {
+    // CodeMirror при прокрутке к нужной строке может сдвинуть всю страницу.
+    // Запоминаем положение и возвращаем его, чтобы задание оставалось на экране.
+    var x = window.scrollX, y = window.scrollY;
+    placeCursor(s);
+    if (window.scrollX !== x || window.scrollY !== y) window.scrollTo(x, y);
+  }
+
+  function placeCursor(s) {
     var doc = docs[s.tab];
     var value = doc.getValue();
     if (s.find) {
@@ -295,7 +340,8 @@
         editor.scrollIntoView(pos, 80);
       }
     }
-    editor.focus();
+    // На узком экране не ставим фокус в редактор: ученик сначала читает задание
+    if (!isStacked()) editor.focus();
   }
 
   function flashMark(doc, from, to) {
@@ -349,6 +395,7 @@
     var b = MFS.buildDocument(projectData(), { mode: 'preview' });
     previewOffset = b.offset;
     clearConsole();
+    setJsError(false);
     $('#preview').srcdoc = b.doc;
   }
 
@@ -360,6 +407,7 @@
       var line = d.line > previewOffset ? d.line - previewOffset : 0;
       var friendly = MFS.friendlyError(d.text);
       addConsole('error', (line ? 'JavaScript, строка ' + line + ': ' : 'JavaScript: ') + friendly, friendly !== d.text ? d.text : '');
+      setJsError(true);
     } else if (d.mfs === 'log') {
       addConsole('log', d.text);
     }
@@ -379,6 +427,12 @@
     body.appendChild(row);
     while (body.children.length > 60) body.removeChild(body.firstChild);
     body.scrollTop = body.scrollHeight;
+  }
+
+  /* Красная метка на вкладке JS и над превью, пока в коде есть ошибка */
+  function setJsError(on) {
+    $('#errorBadge').hidden = !on;
+    $('.tab[data-tab="js"]').classList.toggle('has-error', on);
   }
 
   function clearConsole() {
