@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Первый проект | Morrison Academy</title>
+  <meta name="description" content="Пробный урок по веб-разработке: сделай свой первый сайт и забери его себе.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ===== Стартовый экран ===== -->
+  <section id="landing" class="landing">
+    <header class="topbar">
+      <div class="brand"><span class="brand-mark">M</span><span>Morrison Academy</span></div>
+      <span class="brand-sub">Пробный урок по веб-разработке</span>
+    </header>
+
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Сделай свой первый сайт прямо на уроке</h1>
+        <p class="lead">Пишешь настоящий код, сразу видишь результат и забираешь проект себе: файлами на компьютер и ссылкой, которую можно отправить друзьям и родителям.</p>
+
+        <label class="name-field" for="name">Как тебя зовут?</label>
+        <input id="name" class="name-input" type="text" maxlength="30" autocomplete="off" placeholder="Например, Алия">
+        <p id="nameError" class="field-error" hidden>Сначала впиши имя. Оно появится на сайте и в сертификате.</p>
+
+        <div id="resume" class="resume" hidden>
+          <p id="resumeText"></p>
+          <button id="resumeBtn" class="btn btn-ink" type="button">Продолжить проект</button>
+        </div>
+      </div>
+
+      <div class="demo" aria-hidden="true">
+        <div class="demo-code">
+          <div class="demo-tab">index.html</div>
+<pre><code><span class="t">&lt;div</span> <span class="a">class</span>=<span class="s">"card"</span><span class="t">&gt;</span>
+  <span class="t">&lt;div</span> <span class="a">class</span>=<span class="s">"avatar"</span><span class="t">&gt;</span>🦊<span class="t">&lt;/div&gt;</span>
+  <span class="t">&lt;h1&gt;</span>Привет! Меня зовут <mark class="demo-name">ТВОЁ ИМЯ</mark><span class="t">&lt;/h1&gt;</span>
+<span class="t">&lt;/div&gt;</span></code></pre>
+        </div>
+        <div class="demo-preview">
+          <div class="demo-card">
+            <div class="demo-avatar">🦊</div>
+            <div class="demo-title">Привет! Меня зовут <span class="demo-name">ТВОЁ ИМЯ</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tracks">
+      <article class="track track-front">
+        <div class="track-head"><span class="track-course">Курс Frontend</span><span class="track-age">9-13 лет</span></div>
+        <h2>Сайт про себя</h2>
+        <p>HTML, CSS и первая команда на JavaScript. Аватар, свои цвета, список увлечений и кнопка, которая запускает конфетти.</p>
+        <p class="track-meta">7 шагов, около 40 минут</p>
+        <button class="btn btn-sun" type="button" data-start="front">Начать</button>
+      </article>
+      <article class="track track-pro">
+        <div class="track-head"><span class="track-course">Курс Front PRO</span><span class="track-age">13-18 лет</span></div>
+        <h2>Генератор идей</h2>
+        <p>Настоящее веб-приложение на JavaScript: массив, функция, обработка кликов, счётчик и тёмная тема.</p>
+        <p class="track-meta">7 шагов, около 50 минут</p>
+        <button class="btn btn-sun" type="button" data-start="pro">Начать</button>
+      </article>
+    </div>
+
+    <p class="landing-foot">Проект сохраняется в этом браузере: можно закрыть вкладку и вернуться к нему позже.</p>
+  </section>
+
+  <!-- ===== Рабочее место ===== -->
+  <section id="workspace" class="workspace" hidden>
+    <header class="ws-bar">
+      <span class="brand-mark">M</span>
+      <div class="ws-title"><strong id="wsProject"></strong><span id="wsAuthor"></span></div>
+      <nav id="progress" class="progress" aria-label="Шаги урока"></nav>
+      <div class="ws-actions">
+        <button id="myProjectBtn" class="btn btn-small btn-sun" type="button" hidden>Забрать проект</button>
+        <button id="exitBtn" class="btn btn-small btn-quiet" type="button">Выйти</button>
+      </div>
+    </header>
+
+    <div class="ws-main">
+      <aside class="steps-panel">
+        <p class="step-count" id="stepCount"></p>
+        <h2 id="stepTitle" class="step-title"></h2>
+        <div id="stepText" class="step-text"></div>
+
+        <details id="hint" class="hint">
+          <summary>Подсказка</summary>
+          <p id="hintText"></p>
+          <pre id="hintCode"></pre>
+          <button id="copyHint" class="btn btn-small btn-quiet" type="button">Скопировать код</button>
+        </details>
+
+        <div class="step-actions">
+          <button id="checkBtn" class="btn btn-sun btn-big" type="button">Проверить</button>
+          <button id="nextBtn" class="btn btn-ink btn-big" type="button" hidden>Следующий шаг</button>
+        </div>
+        <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+
+        <div class="step-foot">
+          <button id="revertBtn" class="link-btn" type="button">Вернуть код к началу шага</button>
+          <button id="skipBtn" class="link-btn" type="button" hidden>Пропустить шаг</button>
+        </div>
+      </aside>
+
+      <section class="editor-panel" aria-label="Редактор кода">
+        <div class="tabs" role="tablist">
+          <button class="tab" type="button" role="tab" data-tab="html">HTML <small>структура</small></button>
+          <button class="tab" type="button" role="tab" data-tab="css">CSS <small>оформление</small></button>
+          <button class="tab" type="button" role="tab" data-tab="js">JS <small>поведение</small></button>
+        </div>
+        <div id="editor" class="editor"></div>
+      </section>
+
+      <section class="preview-panel" aria-label="Твой сайт">
+        <div class="preview-bar">
+          <span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="preview-label">Твой сайт</span>
+          <button id="refreshBtn" class="icon-btn" type="button" title="Перезапустить сайт" aria-label="Перезапустить сайт">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+          </button>
+        </div>
+        <iframe id="preview" class="preview" sandbox="allow-scripts allow-same-origin allow-modals" title="Предпросмотр сайта"></iframe>
+        <div id="console" class="console" hidden>
+          <div class="console-head"><span>Консоль</span><button id="clearConsole" class="link-btn" type="button">Очистить</button></div>
+          <div id="consoleBody" class="console-body"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ===== Финал ===== -->
+  <div id="finish" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="finishTitle">
+      <h2 id="finishTitle"></h2>
+      <p class="finish-lead">Этот проект ты написал своими руками. Забери его себе и покажи дома.</p>
+      <div class="finish-actions">
+        <button id="zipBtn" class="action" type="button"><b>Скачать код</b><span>Архив с файлами index.html, style.css и script.js</span></button>
+        <button id="linkBtn" class="action" type="button"><b>Скопировать ссылку</b><span>Отправь её родителям и друзьям</span></button>
+        <button id="openBtn" class="action" type="button"><b>Открыть сайт</b><span>Проект на отдельной странице</span></button>
+      </div>
+      <div class="next-level">
+        <h3>Что ты научишься делать на курсе</h3>
+        <ul id="nextList"></ul>
+      </div>
+      <button id="closeFinish" class="btn btn-quiet" type="button">Вернуться к коду</button>
+    </div>
+  </div>
+
+  <iframe id="checkFrame" class="check-frame" sandbox="allow-scripts allow-same-origin" title="Проверка" aria-hidden="true" tabindex="-1"></iframe>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/xml-fold.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closetag.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/tracks.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
